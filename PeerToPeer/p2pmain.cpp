@@ -9,7 +9,7 @@ using namespace RakNetLabs;
 P2PClient * client;
 
 void ListenForPackets();
-void GetMessages();
+void Play();
 
 int main(void)
 {
@@ -17,7 +17,7 @@ int main(void)
 	client->startup();
 
 	std::thread packetListener(ListenForPackets);
-	GetMessages();
+	Play();
 
 	packetListener.join();
 
@@ -30,7 +30,7 @@ void ListenForPackets()
 	client->readPackets();
 }
 
-void GetMessages()
+void Play()
 {
 	client->play();
 }

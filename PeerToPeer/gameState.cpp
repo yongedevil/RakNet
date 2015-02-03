@@ -39,7 +39,7 @@ void GameState_Lobby::enter()
 }
 void GameState_Lobby::display()
 {
-	system("CLS");
+	//system("CLS");
 	printf("LOBBY\n");
 	printf("Awaiting players: %i of %i ready\n", m_p2pclient->getNumPlayersReady(eReadyEvents::EVENT_READYSTART), m_p2pclient->getNumPlayersWaiting(eReadyEvents::EVENT_READYSTART));
 	printf("\t('r') to ready up\n");
@@ -52,10 +52,17 @@ void GameState_Lobby::input(char ch)
 	{
 	case 'r':
 	case 'R':
+		m_p2pclient->setReadyEvent(eReadyEvents::EVENT_READYSTART, true);
 		break;
 
 	case 'u':
 	case 'U':
+		m_p2pclient->setReadyEvent(eReadyEvents::EVENT_READYSTART, false);
+		break;
+
+	case 'p':
+	case 'P':
+		m_p2pclient->printConnections();
 		break;
 	}
 }
@@ -74,7 +81,7 @@ void GameState_Turn::enter()
 	m_turnCounter++;
 	if(m_turnCounter > m_maxTurns)
 	{
-		m_p2pclient->endGame();
+		m_p2pclient->setState(GameState::state_end);
 	}
 }
 void GameState_Turn::display()

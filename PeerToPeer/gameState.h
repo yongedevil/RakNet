@@ -1,5 +1,5 @@
-
-#include <vector>
+#ifndef _GAMESTATE_H
+#define _GAMESTATE_H
 
 namespace RakNetLabs
 {
@@ -22,7 +22,6 @@ namespace RakNetLabs
 
 	protected:
 		P2PClient * m_p2pclient;
-		std::vector<GameState *> m_validStates;
 	};
 
 	class GameState_Connecting : public GameState
@@ -64,3 +63,5 @@ namespace RakNetLabs
 		void input(char ch);
 	};
 }
+
+#endif

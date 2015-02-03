@@ -55,6 +55,9 @@ namespace RakNetLabs
 		
 		void setState(GameState * state);
 
+		void setReadyEvent(eReadyEvents eventID, bool value);
+		void printConnections();
+
 	private:		
 		void readPacket(RakNet::Packet *packet);
 		void connectionAccepted(RakNet::Packet *packet);
@@ -64,8 +67,6 @@ namespace RakNetLabs
 		void readyEventUnset(RakNet::Packet *packet);
 		void readyEventAllSet(RakNet::Packet *packet);
 		void chatMessage(RakNet::Packet *packet);
-
-		void printConnections();
 		
 		void sendText(char * msg);
 		void sendCommand(char * msg);
@@ -79,8 +80,8 @@ namespace RakNetLabs
 
 		GameState * m_curState;
 		bool m_quit;
+		bool m_redisplay;
 
-		bool m_listen;
 		bool m_connected;
 		int m_serverPort;
 		std::string m_name;

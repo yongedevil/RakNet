@@ -2,6 +2,7 @@
 
 #include <assert.h>
 #include <cstdio>
+#include <iostream>
 
 #include <DS_List.h>
 
@@ -18,7 +19,8 @@ P2PClient::P2PClient() :
 	m_serverPort(DEFAULT_PORT),
 	m_name(""),
 	m_curState(NULL),
-	m_quit(false)
+	m_quit(false),
+	m_redisplay(false)
 {
 
 }
@@ -127,8 +129,14 @@ void P2PClient::play()
 	{
 		if(m_curState)
 		{
-			m_curState->display();
-			m_curState->input('c');
+			if (m_redisplay)
+			{
+				m_curState->display();
+				m_redisplay = false;
+			}
+
+			std::cin >> choice;
+			m_curState->input(choice);
 		}
 	}
 }
@@ -140,6 +148,8 @@ void P2PClient::setState(GameState * state)
 	
 	if(m_curState)
 		m_curState->enter();
+
+	m_redisplay = true;
 }
 
 
@@ -147,7 +157,7 @@ void P2PClient::readPackets()
 {
 	RakNet::Packet * packet = NULL;
 
-	while(m_listen)
+	while(!m_quit)
 	{
 		for(packet = m_peer->Receive(); packet; m_peer->DeallocatePacket(packet), packet = m_peer->Receive())
 		{
@@ -232,16 +242,16 @@ void P2PClient::readPacket(RakNet::Packet *packet)
 		break;
 	
 	//custom packets
-	case ClientGameMessages::ID_CHAT_MESSAGE:
+	case static_cast<int>(ClientGameMessages::ID_CHAT_MESSAGE):
 		chatMessage(packet);
 		break;
-	case ClientGameMessages::ID_START_GAME:
+	case static_cast<int>(ClientGameMessages::ID_START_GAME):
 		chatMessage(packet);
 		break;
-	case ClientGameMessages::ID_END_TURN:
+	case static_cast<int>(ClientGameMessages::ID_END_TURN):
 		chatMessage(packet);
 		break;
-	case ClientGameMessages::ID_END_GAME:
+	case static_cast<int>(ClientGameMessages::ID_END_GAME):
 		chatMessage(packet);
 		break;
 	default:
@@ -252,21 +262,25 @@ void P2PClient::readPacket(RakNet::Packet *packet)
 
 void P2PClient::incomingConnection(RakNet::Packet *packet)
 {
+	m_readyEventPlugin.AddToWaitList(static_cast<int>(eReadyEvents::EVENT_READYSTART), packet->guid);
+	/*
 	if(GameState::state_connecting == m_curState)
 	{
-		m_readyEventPlugin.AddToWaitList(static_cast<int>(eReadyEvents::EVENT_ENDTURN), packet->guid);
-	}
+		m_readyEventPlugin.AddToWaitList(static_cast<int>(eReadyEvents::EVENT_READYSTART), packet->guid);
+	}*/
 }
 
 void P2PClient::connectionAccepted(RakNet::Packet *packet)
 {
+	m_readyEventPlugin.AddToWaitList(static_cast<int>(eReadyEvents::EVENT_READYSTART), packet->guid);
+	/*
 	if(GameState::state_connecting == m_curState)
 	{
-		m_readyEventPlugin.AddToWaitList(static_cast<int>(eReadyEvents::EVENT_ENDTURN), packet->guid);
+		m_readyEventPlugin.AddToWaitList(static_cast<int>(eReadyEvents::EVENT_READYSTART), packet->guid);
 		m_connected = true;
 
-		setState(GameState::state_lobby);
-	}
+	}*/
+	setState(GameState::state_lobby);
 }
 
 void P2PClient::disconnectMessage(RakNet::Packet *packet)
@@ -479,4 +493,10 @@ int P2PClient::getNumPlayersReady(eReadyEvents eventID)
 	}
 
 	return numReady;
+}
+
+
+void P2PClient::setReadyEvent(eReadyEvents eventID, bool value)
+{
+	m_readyEventPlugin.SetEvent(static_cast<int>(eventID), value);
 }
