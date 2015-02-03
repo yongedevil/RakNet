@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RaknetClient", "RaknetClient\RaknetClient.vcxproj", "{12872536-3A09-4213-8F6E-3DA46E431A2C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RaknetServer", "RaknetServer\RaknetServer.vcxproj", "{EAB0229E-6FBB-4449-A967-B4AF3C3F938E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RaknetTutorial", "RaknetTutorial\RaknetTutorial.vcxproj", "{68F3C927-9332-4883-ABB3-88DB7C3BEA25}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PeerToPeer", "PeerToPeer\PeerToPeer.vcxproj", "{A75DAACC-5B7D-4ED6-B017-43C23676DE37}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{12872536-3A09-4213-8F6E-3DA46E431A2C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{12872536-3A09-4213-8F6E-3DA46E431A2C}.Debug|Win32.Build.0 = Debug|Win32
+		{12872536-3A09-4213-8F6E-3DA46E431A2C}.Release|Win32.ActiveCfg = Release|Win32
+		{12872536-3A09-4213-8F6E-3DA46E431A2C}.Release|Win32.Build.0 = Release|Win32
+		{EAB0229E-6FBB-4449-A967-B4AF3C3F938E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{EAB0229E-6FBB-4449-A967-B4AF3C3F938E}.Debug|Win32.Build.0 = Debug|Win32
+		{EAB0229E-6FBB-4449-A967-B4AF3C3F938E}.Release|Win32.ActiveCfg = Release|Win32
+		{EAB0229E-6FBB-4449-A967-B4AF3C3F938E}.Release|Win32.Build.0 = Release|Win32
+		{68F3C927-9332-4883-ABB3-88DB7C3BEA25}.Debug|Win32.ActiveCfg = Debug|Win32
+		{68F3C927-9332-4883-ABB3-88DB7C3BEA25}.Debug|Win32.Build.0 = Debug|Win32
+		{68F3C927-9332-4883-ABB3-88DB7C3BEA25}.Release|Win32.ActiveCfg = Release|Win32
+		{68F3C927-9332-4883-ABB3-88DB7C3BEA25}.Release|Win32.Build.0 = Release|Win32
+		{A75DAACC-5B7D-4ED6-B017-43C23676DE37}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A75DAACC-5B7D-4ED6-B017-43C23676DE37}.Debug|Win32.Build.0 = Debug|Win32
+		{A75DAACC-5B7D-4ED6-B017-43C23676DE37}.Release|Win32.ActiveCfg = Release|Win32
+		{A75DAACC-5B7D-4ED6-B017-43C23676DE37}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
