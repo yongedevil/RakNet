@@ -1,7 +1,11 @@
 #include "p2pclient.h"
 
 #include <assert.h>
+#include <cstdio>
 
+#include <DS_List.h>
+
+#include "gameState.h"
 
 using namespace RakNetLabs;
 
@@ -13,8 +17,8 @@ P2PClient::P2PClient() :
 	m_peer(NULL),
 	m_serverPort(DEFAULT_PORT),
 	m_name(""),
-	m_listen(true),
-	m_connected(false)
+	m_curState(NULL),
+	m_quit(false)
 {
 
 }
@@ -32,8 +36,6 @@ void P2PClient::startup(int & serverPort)
 	printf("Please enter your name: ");
 	gets_s(name_str);
 	m_name = std::string(name_str);
-
-
 
 	m_peer = RakNet::RakPeerInterface::GetInstance();
 
@@ -87,6 +89,14 @@ void P2PClient::startup(int & serverPort)
 	assert(RakNet::CONNECTION_ATTEMPT_STARTED == connectResult);
 
 	printf("connecting...\n");
+
+	//setup states
+	GameState::state_connecting->init(this);
+	GameState::state_lobby->init(this);
+	GameState::state_turn->init(this);
+	GameState::state_end->init(this);
+
+	m_curState = GameState::state_connecting;
 }
 
 void P2PClient::shutdown()
@@ -109,31 +119,29 @@ void P2PClient::shutdown()
 	RakNet::RakPeerInterface::DestroyInstance(m_peer);
 }
 
-
-void P2PClient::getMessages()
+void P2PClient::play()
 {
-	char customMessage[512];
+	char choice = 0;
 
-	while(!m_connected)
+	while(!m_quit)
 	{
-	}
-
-	while(m_listen)
-	{
-		printf("You: ");
-		gets_s(customMessage, 512);
-
-		if(customMessage[0] == '/')
+		if(m_curState)
 		{
-			sendCommand(customMessage);
-		}
-
-		else
-		{
-			sendText(customMessage);
+			m_curState->display();
+			m_curState->input('c');
 		}
 	}
 }
+
+
+void P2PClient::setState(GameState * state)
+{
+	m_curState = state;
+	
+	if(m_curState)
+		m_curState->enter();
+}
+
 
 void P2PClient::readPackets()
 {
@@ -156,20 +164,25 @@ void P2PClient::readPacket(RakNet::Packet *packet)
 	{
 
 	case ID_NEW_INCOMING_CONNECTION:
-		printf("A connection is incoming.\n");
+		printf("ID_NEW_INCOMING_CONNECTION\n");
+		incomingConnection(packet);
 		break;
 	case ID_CONNECTION_REQUEST_ACCEPTED:
+		printf("ID_CONNECTION_REQUEST_ACCEPTED\n");
 		connectionAccepted(packet);
 		break;
 	case ID_READY_EVENT_ALL_SET:
+		printf("Got ID_READY_EVENT_ALL_SET from %s\n", packet->guid.ToString());
 		readyEventAllSet(packet);
 		break;
 
 	case ID_READY_EVENT_SET:
+		printf("Got ID_READY_EVENT_SET from %s\n", packet->guid.ToString());
 		readyEventSet(packet);
 		break;
 
 	case ID_READY_EVENT_UNSET:
+		printf("Got ID_READY_EVENT_UNSET from %s\n", packet->guid.ToString());
 		readyEventUnset(packet);
 		break;
 
@@ -218,11 +231,18 @@ void P2PClient::readPacket(RakNet::Packet *packet)
 		printf("Ping from %s\n", packet->systemAddress.ToString(true));
 		break;
 	
-	case ClientGameMessages::ID_GAME_MESSAGE_1:
-		GameMessage1(packet);
+	//custom packets
+	case ClientGameMessages::ID_CHAT_MESSAGE:
+		chatMessage(packet);
 		break;
-	case ClientGameMessages::ID_GAME_MESSAGE_2:
-		GameMessage2(packet);
+	case ClientGameMessages::ID_START_GAME:
+		chatMessage(packet);
+		break;
+	case ClientGameMessages::ID_END_TURN:
+		chatMessage(packet);
+		break;
+	case ClientGameMessages::ID_END_GAME:
+		chatMessage(packet);
 		break;
 	default:
 		printf("Message with identifier %i has arrived.\n", packet->data[0]);
@@ -230,11 +250,23 @@ void P2PClient::readPacket(RakNet::Packet *packet)
 	}
 }
 
+void P2PClient::incomingConnection(RakNet::Packet *packet)
+{
+	if(GameState::state_connecting == m_curState)
+	{
+		m_readyEventPlugin.AddToWaitList(static_cast<int>(eReadyEvents::EVENT_ENDTURN), packet->guid);
+	}
+}
+
 void P2PClient::connectionAccepted(RakNet::Packet *packet)
 {
-	m_hostAddress = packet->systemAddress;
-	printf("Our connection request has been accepted.\n");
-	m_connected = true;
+	if(GameState::state_connecting == m_curState)
+	{
+		m_readyEventPlugin.AddToWaitList(static_cast<int>(eReadyEvents::EVENT_ENDTURN), packet->guid);
+		m_connected = true;
+
+		setState(GameState::state_lobby);
+	}
 }
 
 void P2PClient::disconnectMessage(RakNet::Packet *packet)
@@ -246,27 +278,11 @@ void P2PClient::disconnectMessage(RakNet::Packet *packet)
 	printf("%s\n", rs.C_String());
 }
 
-void P2PClient::GameMessage1(RakNet::Packet *packet)
+void P2PClient::chatMessage(RakNet::Packet *packet)
 {
 	RakNet::RakString rs;
 	RakNet::BitStream bsIn(packet->data,packet->length,false);
 	//read in custom message
-	bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
-	bsIn.Read(rs);
-	printf("%s\n", rs.C_String());
-
-	//now the server is sending a message back all client
-	RakNet::BitStream bsOut;
-	bsOut.Write((RakNet::MessageID)ClientGameMessages::ID_GAME_MESSAGE_2);
-
-	bsOut.Write(rs.C_String());
-	m_peer->Send(&bsOut,HIGH_PRIORITY,RELIABLE_ORDERED,0,packet->systemAddress,true);
-}
-
-void P2PClient::GameMessage2(RakNet::Packet *packet)
-{
-	RakNet::RakString rs;
-	RakNet::BitStream bsIn(packet->data,packet->length,false);
 	bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
 
 	bsIn.Read(rs);
@@ -316,6 +332,10 @@ void P2PClient::readyEventSet(RakNet::Packet *packet)
 
 	switch(eventID)
 	{
+	case eReadyEvents::EVENT_READYSTART:
+		printf("ready to start\n");
+		break;
+
 	case eReadyEvents::EVENT_ENDTURN:
 		printf("end turn\n");
 		break;
@@ -340,6 +360,10 @@ void P2PClient::readyEventUnset(RakNet::Packet *packet)
 	
 	switch(eventID)
 	{
+	case eReadyEvents::EVENT_READYSTART:
+		printf("ready to start\n");
+		break;
+
 	case eReadyEvents::EVENT_ENDTURN:
 		printf("end turn\n");
 		break;
@@ -364,11 +388,18 @@ void P2PClient::readyEventAllSet(RakNet::Packet *packet)
 
 	switch(eventID)
 	{
+	case eReadyEvents::EVENT_READYSTART:
+		setState(GameState::state_turn);
+		printf("ready to start\n");
+		break;
+
 	case eReadyEvents::EVENT_ENDTURN:
+		setState(GameState::state_turn);
 		printf("end turn\n");
 		break;
 
 	case eReadyEvents::EVENT_ENDGAME:
+		setState(GameState::state_end);
 		printf("end game\n");
 		break;
 
@@ -382,7 +413,7 @@ void P2PClient::sendText(char * msg)
 	if(0 != msg[0] || true)
 	{
 		RakNet::BitStream bsOut;
-		bsOut.Write((RakNet::MessageID)ClientGameMessages::ID_GAME_MESSAGE_1);
+		bsOut.Write((RakNet::MessageID)ClientGameMessages::ID_CHAT_MESSAGE);
 		bsOut.Write(m_name.c_str());
 		bsOut.Write(msg);
 		m_peer->Send(&bsOut,HIGH_PRIORITY,RELIABLE_ORDERED,0,RakNet::UNASSIGNED_SYSTEM_ADDRESS,true);
@@ -406,4 +437,46 @@ void P2PClient::sendCommand(char * msg)
 		else
 			printf("This system is unsignaled FAILED\n");
 	}
+}
+
+int P2PClient::getNumPlayersWaiting(eReadyEvents eventID)
+{
+	int numPlayer = 0;
+
+	DataStructures::List<RakNet::SystemAddress> addresses;
+	DataStructures::List<RakNet::RakNetGUID> guids;
+	m_peer->GetSystemList(addresses, guids);
+	
+	for(int i = 0; i < guids.Size(); ++i)
+	{
+		RakNet::ReadyEventSystemStatus status = m_readyEventPlugin.GetReadyStatus(static_cast<int>(eventID), guids[i]);
+
+		if(RakNet::RES_NOT_WAITING != status && RakNet::RES_UNKNOWN_EVENT != status)
+		{
+			numPlayer++;
+		}
+	}
+
+	return numPlayer;
+}
+
+int P2PClient::getNumPlayersReady(eReadyEvents eventID)
+{
+	int numReady = 0;
+
+	DataStructures::List<RakNet::SystemAddress> addresses;
+	DataStructures::List<RakNet::RakNetGUID> guids;
+	m_peer->GetSystemList(addresses, guids);
+
+	for(int i = 0; i < guids.Size(); ++i)
+	{
+		RakNet::ReadyEventSystemStatus status = m_readyEventPlugin.GetReadyStatus(static_cast<int>(eventID), guids[i]);
+
+		if(RakNet::RES_READY == status || RakNet::RES_ALL_READY == status )
+		{
+			numReady++;
+		}
+	}
+
+	return numReady;
 }

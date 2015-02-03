@@ -1,11 +1,24 @@
-﻿Build started 2/3/2015 11:12:37 AM.
-     1>Project "C:\Users\bicely\Documents\GitHub\RakNet\PeerToPeer\PeerToPeer.vcxproj" on node 2 (Build target(s)).
-     1>Link:
-         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\bicely\Documents\GitHub\RakNet\Debug\PeerToPeer.exe" /INCREMENTAL /NOLOGO RakNet_VS2008_LibStatic_Debug_Win32.lib ws2_32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\bicely\Documents\GitHub\RakNet\Debug\PeerToPeer.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\bicely\Documents\GitHub\RakNet\Debug\PeerToPeer.lib" /MACHINE:X86 Debug\2p2client.obj
-         Debug\p2pmain.obj
-         PeerToPeer.vcxproj -> C:\Users\bicely\Documents\GitHub\RakNet\Debug\PeerToPeer.exe
-     1>Done Building Project "C:\Users\bicely\Documents\GitHub\RakNet\PeerToPeer\PeerToPeer.vcxproj" (Build target(s)).
+﻿Build started 2/3/2015 2:10:17 PM.
+     1>Project "C:\Users\100723472\Documents\GitHub\RakNet\PeerToPeer\PeerToPeer.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt 2p2client.cpp gameState.cpp p2pmain.cpp
+         2p2client.cpp
+     1>c:\users\100723472\documents\github\raknet\peertopeer\2p2client.cpp(392): error C3861: 'enterGame': identifier not found
+     1>c:\users\100723472\documents\github\raknet\peertopeer\2p2client.cpp(397): error C3861: 'enterTurn': identifier not found
+     1>c:\users\100723472\documents\github\raknet\peertopeer\2p2client.cpp(402): error C3861: 'endGame': identifier not found
+     1>c:\users\100723472\documents\github\raknet\peertopeer\2p2client.cpp(450): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\100723472\documents\github\raknet\peertopeer\2p2client.cpp(471): warning C4018: '<' : signed/unsigned mismatch
+         Generating Code...
+         Compiling...
+         gameState.cpp
+     1>c:\users\100723472\documents\github\raknet\peertopeer\gamestate.cpp(77): error C2039: 'endGame' : is not a member of 'RakNetLabs::P2PClient'
+                 c:\users\100723472\documents\github\raknet\peertopeer\p2pclient.h(36) : see declaration of 'RakNetLabs::P2PClient'
+         Generating Code...
+         Compiling...
+         p2pmain.cpp
+         Generating Code...
+     1>Done Building Project "C:\Users\100723472\Documents\GitHub\RakNet\PeerToPeer\PeerToPeer.vcxproj" (Build target(s)) -- FAILED.
 
-Build succeeded.
+Build FAILED.
 
-Time Elapsed 00:00:00.85
+Time Elapsed 00:00:02.66

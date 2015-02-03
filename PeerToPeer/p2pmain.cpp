@@ -32,5 +32,5 @@ void ListenForPackets()
 
 void GetMessages()
 {
-	client->getMessages();
+	client->play();
 }

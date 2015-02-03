@@ -75,9 +75,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="2p2client.cpp" />
+    <ClCompile Include="gameState.cpp" />
     <ClCompile Include="p2pmain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="gameState.h" />
     <ClInclude Include="p2pclient.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
