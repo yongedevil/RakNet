@@ -28,6 +28,7 @@ void GameState_Connecting::enter()
 }
 void GameState_Connecting::display()
 {
+	printf("CONNECTING...\n\n");
 }
 void GameState_Connecting::input(char ch)
 {
@@ -39,12 +40,10 @@ void GameState_Lobby::enter()
 }
 void GameState_Lobby::display()
 {
-	//system("CLS");
 	printf("LOBBY\n");
 	printf("Awaiting players: %i of %i ready\n", m_p2pclient->getNumPlayersReady(eReadyEvents::EVENT_READYSTART), m_p2pclient->getNumPlayersWaiting(eReadyEvents::EVENT_READYSTART));
 	printf("\t('r') to ready up\n");
-	printf("\t('u') to unready\n");
-	printf("\n:");
+	printf("\t('u') to unready\n\n");
 }
 void GameState_Lobby::input(char ch)
 {
@@ -86,10 +85,10 @@ void GameState_Turn::enter()
 }
 void GameState_Turn::display()
 {
-	system("CLS");
 	printf("TURN: %i\n", m_turnCounter);
 	printf("%i of %i players finished their turn\n", m_p2pclient->getNumPlayersReady(eReadyEvents::EVENT_ENDTURN), m_p2pclient->getNumPlayersWaiting(eReadyEvents::EVENT_ENDTURN));
-	printf("\t('e') to end turn\n\n");
+	printf("\t('e') to end turn\n");
+	printf("\t('q') to end game\n\n");
 }
 void GameState_Turn::input(char ch)
 {
@@ -97,6 +96,12 @@ void GameState_Turn::input(char ch)
 	{
 	case 'e':
 	case 'E':
+		m_p2pclient->setReadyEvent(eReadyEvents::EVENT_ENDTURN, true);
+		break;
+
+	case 'q':
+	case 'Q':
+		m_p2pclient->setReadyEvent(eReadyEvents::EVENT_ENDGAME, true);
 		break;
 	}
 }
@@ -107,7 +112,6 @@ void GameState_End::enter()
 }
 void GameState_End::display()
 {
-	system("CLS");
 	printf("GAMEOVER\n");
 }
 void GameState_End::input(char ch)

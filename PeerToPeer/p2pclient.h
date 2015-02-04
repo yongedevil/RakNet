@@ -71,6 +71,15 @@ namespace RakNetLabs
 		void sendText(char * msg);
 		void sendCommand(char * msg);
 
+		void setMsg(std::string msg);
+		void clearMsg();
+		
+		void setMsgRak(std::string msg);
+		void clearMsgRak();
+
+		void setMsgChat(std::string msg);
+		void clearMsgChat();
+
 
 	private:
 		RakNet::RakPeerInterface * m_peer;
@@ -82,10 +91,12 @@ namespace RakNetLabs
 		bool m_quit;
 		bool m_redisplay;
 
-		bool m_connected;
+		std::string m_msgRak;
+		std::string m_msgChat;
+		std::string m_msg;
+
 		int m_serverPort;
 		std::string m_name;
-		RakNet::SystemAddress m_hostAddress;
 	};
 
 }
